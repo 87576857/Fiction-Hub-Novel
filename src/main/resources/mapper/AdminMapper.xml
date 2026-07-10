@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.AdminMapper">
+
+    <select id="countTodayNewNovels" resultType="int">
+        SELECT COUNT(*) FROM Novels WHERE DATE(created_at) = CURDATE()
+    </select>
+
+    <select id="countTodayNewPosts" resultType="int">
+        SELECT COUNT(*) FROM Posts WHERE DATE(created_at) = CURDATE()
+    </select>
+
+    <!-- PostMapper.xml에 이미 정의된 postResultMap을 그대로 재사용 (컬럼 매핑 중복 방지) -->
+    <select id="selectAllPostsForAdmin" resultMap="com.novel.dao.PostMapper.postResultMap">
+        SELECT p.*, u.nickname AS nickname,
+               (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count,
+               CASE b.board_name
+                   WHEN '이 소설 찾아요' THEN 'find'
+                   WHEN '신인작가 광장' THEN 'rookie'
+                   WHEN '작가 정보관' THEN 'author'
+               END AS board_key
+        FROM Posts p
+        JOIN integrated_user u ON p.user_id = u.user_id
+        JOIN Boards b ON p.board_id = b.board_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (p.title LIKE CONCAT('%', #{keyword}, '%')
+                     OR p.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.nickname LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        <if test="boardKey != null and boardKey != ''">
+            HAVING board_key = #{boardKey}
+        </if>
+        ORDER BY p.created_at DESC
+    </select>
+
+    <delete id="deletePostsByIds">
+        DELETE FROM Posts WHERE post_id IN
+        <foreach collection="postIds" item="postId" open="(" separator="," close=")">
+            #{postId}
+        </foreach>
+    </delete>
+
+    <!-- CommentMapper.xml에 이미 정의된 commentResultMap을 그대로 재사용 -->
+    <select id="selectAllCommentsForAdmin" resultMap="com.novel.dao.CommentMapper.commentResultMap">
+        SELECT c.*, u.nickname AS nickname,
+               CASE b.board_name
+                   WHEN '이 소설 찾아요' THEN 'find'
+                   WHEN '신인작가 광장' THEN 'rookie'
+                   WHEN '작가 정보관' THEN 'author'
+               END AS board_key,
+               'comment' AS type
+        FROM Comments c
+        JOIN integrated_user u ON c.user_id = u.user_id
+        JOIN Posts p ON c.post_id = p.post_id
+        JOIN Boards b ON p.board_id = b.board_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (c.content LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                     OR p.title LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        <if test="boardKey != null and boardKey != ''">
+            HAVING board_key = #{boardKey}
+        </if>
+        ORDER BY c.created_at DESC
+    </select>
+
+    <delete id="deleteCommentsByIds">
+        DELETE FROM Comments WHERE comment_id IN
+        <foreach collection="commentIds" item="commentId" open="(" separator="," close=")">
+            #{commentId}
+        </foreach>
+    </delete>
+
+</mapper>

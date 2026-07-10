@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.NovelReviewMapper">
+
+    <resultMap id="reviewResultMap" type="com.novel.domain.NovelReview">
+        <id property="reviewId" column="review_id" />
+        <result property="novelId" column="novel_id" />
+        <result property="userId" column="user_id" />
+        <result property="reviewText" column="review_text" />
+        <result property="rating" column="rating" />
+        <result property="likes" column="likes" />
+        <result property="createdAt" column="created_at" />
+        <result property="nickname" column="nickname" />
+        <result property="isAuthor" column="is_author" />
+    </resultMap>
+
+    <select id="selectReviewsByNovel" resultMap="reviewResultMap">
+        SELECT r.*, u.nickname AS nickname, u.is_author AS is_author
+        FROM Novel_Reviews r
+        JOIN integrated_user u ON r.user_id = u.user_id
+        WHERE r.novel_id = #{novelId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectAverageRating" resultType="java.lang.Double">
+        SELECT ROUND(AVG(rating), 1) FROM Novel_Reviews WHERE novel_id = #{novelId}
+    </select>
+
+    <select id="countReviews" resultType="int">
+        SELECT COUNT(*) FROM Novel_Reviews WHERE novel_id = #{novelId}
+    </select>
+
+    <select id="countByNovelAndUser" resultType="int">
+        SELECT COUNT(*) FROM Novel_Reviews WHERE novel_id = #{novelId} AND user_id = #{userId}
+    </select>
+
+    <insert id="insertReview" parameterType="com.novel.domain.NovelReview" useGeneratedKeys="true" keyProperty="reviewId">
+        INSERT INTO Novel_Reviews (novel_id, user_id, review_text, rating)
+        VALUES (#{novelId}, #{userId}, #{reviewText}, #{rating})
+    </insert>
+
+    <update id="increaseLikes">
+        UPDATE Novel_Reviews SET likes = likes + 1 WHERE review_id = #{reviewId}
+    </update>
+
+    <select id="countLikeByReviewAndUser" resultType="int">
+        SELECT COUNT(*) FROM Review_Likes WHERE review_id = #{reviewId} AND user_id = #{userId}
+    </select>
+
+    <insert id="insertLike">
+        INSERT INTO Review_Likes (review_id, user_id) VALUES (#{reviewId}, #{userId})
+    </insert>
+
+    <select id="selectLikedReviewIds" resultType="java.lang.Integer">
+        SELECT rl.review_id
+        FROM Review_Likes rl
+        JOIN Novel_Reviews r ON rl.review_id = r.review_id
+        WHERE r.novel_id = #{novelId} AND rl.user_id = #{userId}
+    </select>
+
+    <select id="selectTopLikedReviews" resultMap="reviewResultMap">
+        SELECT r.*, u.nickname AS nickname, u.is_author AS is_author
+        FROM Novel_Reviews r
+        JOIN integrated_user u ON r.user_id = u.user_id
+        WHERE r.novel_id = #{novelId} AND r.likes > 0
+        ORDER BY r.likes DESC, r.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 리뷰를 Comment 형태로 변환: 마이페이지 "내가 쓴 댓글" 목록에서 게시판 댓글과 통합 노출하기 위함 -->
+    <!-- CommentMapper.xml에 이미 정의된 commentResultMap을 그대로 재사용 -->
+    <select id="selectReviewsAsCommentsByUser" resultMap="com.novel.dao.CommentMapper.commentResultMap">
+        SELECT r.review_id AS comment_id,
+               r.novel_id AS post_id,
+               r.user_id AS user_id,
+               r.review_text AS content,
+               r.likes AS likes,
+               r.created_at AS created_at,
+               u.nickname AS nickname,
+               u.is_author AS is_author,
+               n.title AS post_title,
+               'review' AS board_key,
+               'review' AS type
+        FROM Novel_Reviews r
+        JOIN integrated_user u ON r.user_id = u.user_id
+        JOIN Novels n ON r.novel_id = n.novel_id
+        WHERE r.user_id = #{userId}
+        ORDER BY r.created_at DESC
+    </select>
+
+    <!-- 관리자 콘텐츠 관리 화면(댓글 목록)용 전체 리뷰 (Comment 형태로 변환) -->
+    <select id="selectAllReviewsForAdminAsComments" resultMap="com.novel.dao.CommentMapper.commentResultMap">
+        SELECT r.review_id AS comment_id,
+               r.novel_id AS post_id,
+               r.user_id AS user_id,
+               r.review_text AS content,
+               r.likes AS likes,
+               r.created_at AS created_at,
+               u.nickname AS nickname,
+               u.is_author AS is_author,
+               n.title AS post_title,
+               'review' AS board_key,
+               'review' AS type
+        FROM Novel_Reviews r
+        JOIN integrated_user u ON r.user_id = u.user_id
+        JOIN Novels n ON r.novel_id = n.novel_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (r.review_text LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                     OR n.title LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY r.created_at DESC
+    </select>
+
+    <!-- 본인 리뷰 삭제: user_id 조건을 함께 걸어 본인 리뷰만 삭제 가능 -->
+    <delete id="deleteReviewByIdAndUser">
+        DELETE FROM Novel_Reviews
+        WHERE review_id = #{reviewId} AND user_id = #{userId}
+    </delete>
+
+    <delete id="deleteReviewsByIds">
+        DELETE FROM Novel_Reviews WHERE review_id IN
+        <foreach collection="reviewIds" item="reviewId" open="(" separator="," close=")">
+            #{reviewId}
+        </foreach>
+    </delete>
+
+</mapper>

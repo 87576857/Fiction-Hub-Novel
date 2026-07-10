@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- @RequestMapping 등 애노테이션 활성화 -->
+	<annotation-driven />
+
+	<!-- 정적 리소스(css/js/이미지) 직접 서빙 -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- JSP 뷰 리졸버: WEB-INF/views/ 안의 jsp만 응답 가능 (직접 URL 접근 차단) -->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+	<!-- Controller만 스캔 (Service/DAO는 root-context에서 스캔) -->
+	<context:component-scan base-package="com.novel.controller" />
+
+	<!-- 관리자 모드 접근 제어: /admin/** 은 role=ADMIN인 로그인 회원만 통과 -->
+	<interceptors>
+		<interceptor>
+			<mapping path="/admin/**" />
+			<beans:bean class="com.novel.interceptor.AdminInterceptor" />
+		</interceptor>
+	</interceptors>
+
+</beans:beans>

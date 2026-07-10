@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.UserMapper">
+
+    <resultMap id="userResultMap" type="com.novel.domain.User">
+        <id property="userId" column="user_id" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="nickname" column="nickname" />
+        <result property="email" column="email" />
+        <result property="age" column="age" />
+        <result property="role" column="role" />
+        <result property="isAuthor" column="is_author" />
+        <result property="penName" column="pen_name" />
+        <result property="isSuspended" column="is_suspended" />
+        <result property="suspendedReason" column="suspended_reason" />
+        <result property="suspendedAt" column="suspended_at" />
+        <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <select id="selectUserList" resultMap="userResultMap">
+        SELECT * FROM integrated_user
+        <if test="keyword != null and keyword != ''">
+            WHERE username LIKE CONCAT('%', #{keyword}, '%')
+               OR nickname LIKE CONCAT('%', #{keyword}, '%')
+               OR email LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="countTotalUsers" resultType="int">
+        SELECT COUNT(*) FROM integrated_user
+    </select>
+
+    <select id="countTodayNewUsers" resultType="int">
+        SELECT COUNT(*) FROM integrated_user WHERE DATE(created_at) = CURDATE()
+    </select>
+
+    <select id="selectRecentUsers" resultMap="userResultMap">
+        SELECT * FROM integrated_user ORDER BY created_at DESC LIMIT #{limit}
+    </select>
+
+    <select id="selectUserById" resultMap="userResultMap">
+        SELECT * FROM integrated_user WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectUserByUsername" resultMap="userResultMap">
+        SELECT * FROM integrated_user WHERE username = #{username}
+    </select>
+
+    <select id="selectUserByEmail" resultMap="userResultMap">
+        SELECT * FROM integrated_user WHERE email = #{email}
+    </select>
+
+    <select id="countByUsername" resultType="int">
+        SELECT COUNT(*) FROM integrated_user WHERE username = #{username}
+    </select>
+
+    <select id="countByEmail" resultType="int">
+        SELECT COUNT(*) FROM integrated_user WHERE email = #{email}
+    </select>
+
+    <insert id="insertUser" parameterType="com.novel.domain.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO integrated_user (username, password, nickname, email, age, role)
+        VALUES (#{username}, #{password}, #{nickname}, #{email}, #{age}, 'USER')
+    </insert>
+
+    <update id="updatePassword">
+        UPDATE integrated_user SET password = #{password} WHERE user_id = #{userId}
+    </update>
+
+    <!-- 마이페이지 내정보 수정: 닉네임/이메일/나이만 변경 (아이디, 비밀번호는 별도 절차) -->
+    <update id="updateUserInfo">
+        UPDATE integrated_user
+        SET nickname = #{nickname}, email = #{email}, age = #{age}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 이메일 중복 체크 (본인 제외) - 내정보 수정 시 이메일 변경용 -->
+    <select id="countByEmailExcludingUser" resultType="int">
+        SELECT COUNT(*) FROM integrated_user WHERE email = #{email} AND user_id != #{userId}
+    </select>
+
+    <update id="updateRole">
+        UPDATE integrated_user SET role = #{role} WHERE user_id = #{userId}
+    </update>
+
+    <update id="suspendUser">
+        UPDATE integrated_user
+        SET is_suspended = TRUE, suspended_reason = #{reason}, suspended_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="unsuspendUser">
+        UPDATE integrated_user
+        SET is_suspended = FALSE, suspended_reason = NULL, suspended_at = NULL
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="verifyAuthor">
+        UPDATE integrated_user
+        SET is_author = TRUE, pen_name = #{penName}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

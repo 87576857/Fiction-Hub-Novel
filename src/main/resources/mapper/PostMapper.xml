@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.PostMapper">
+
+    <resultMap id="postResultMap" type="com.novel.domain.Post">
+        <id property="postId" column="post_id" />
+        <result property="boardId" column="board_id" />
+        <result property="userId" column="user_id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="targetAuthor" column="target_author" />
+        <result property="platformTag" column="platform_tag" />
+        <result property="viewCount" column="view_count" />
+        <result property="isSolved" column="is_solved" />
+        <result property="createdAt" column="created_at" />
+        <result property="nickname" column="nickname" />
+        <result property="isAuthor" column="is_author" />
+        <result property="commentCount" column="comment_count" />
+        <result property="boardKey" column="board_key" />
+    </resultMap>
+
+    <!-- find/rookie/author 3개 게시판 통합, 조회수 내림차순 N개 (홈 화면 인기글) -->
+    <select id="selectTopPostsByView" resultMap="postResultMap">
+        SELECT p.*, u.nickname AS nickname, u.is_author AS is_author,
+               (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count,
+               CASE b.board_name
+                   WHEN '이 소설 찾아요' THEN 'find'
+                   WHEN '신인작가 광장' THEN 'rookie'
+                   WHEN '작가 정보관' THEN 'author'
+               END AS board_key
+        FROM Posts p
+        JOIN integrated_user u ON p.user_id = u.user_id
+        JOIN Boards b ON p.board_id = b.board_id
+        ORDER BY p.view_count DESC, p.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- find/rookie/author 게시판 각각에서 조회수 상위 N건씩 조회 (홈 화면 게시판 블록용) -->
+    <select id="selectTopPostsPerBoard" resultMap="postResultMap">
+        SELECT t.post_id, t.board_id, t.user_id, t.title, t.content, t.target_author,
+               t.platform_tag, t.view_count, t.is_solved, t.created_at,
+               t.nickname, t.is_author, t.comment_count, t.board_key
+        FROM (
+            SELECT p.*, u.nickname AS nickname, u.is_author AS is_author,
+                   (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count,
+                   CASE b.board_name
+                       WHEN '이 소설 찾아요' THEN 'find'
+                       WHEN '신인작가 광장' THEN 'rookie'
+                       WHEN '작가 정보관' THEN 'author'
+                   END AS board_key,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY p.board_id
+                       ORDER BY p.view_count DESC, p.created_at DESC
+                   ) AS rn
+            FROM Posts p
+            JOIN integrated_user u ON p.user_id = u.user_id
+            JOIN Boards b ON p.board_id = b.board_id
+        ) t
+        WHERE t.rn &lt;= #{limit}
+        ORDER BY t.board_id, t.rn
+    </select>
+
+    <select id="selectPostsByBoard" resultMap="postResultMap">
+        SELECT p.*, u.nickname AS nickname, u.is_author AS is_author,
+               (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count
+        FROM Posts p
+        JOIN integrated_user u ON p.user_id = u.user_id
+        WHERE p.board_id = #{boardId}
+        <if test="tag != null and tag != '' and tag != '전체'">
+            AND p.platform_tag = #{tag}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (p.title LIKE CONCAT('%', #{keyword}, '%')
+                 OR p.content LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.nickname LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY p.created_at DESC
+    </select>
+
+    <select id="selectPostById" resultMap="postResultMap">
+        SELECT p.*, u.nickname AS nickname, u.is_author AS is_author,
+               (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count
+        FROM Posts p
+        JOIN integrated_user u ON p.user_id = u.user_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+    <insert id="insertPost" parameterType="com.novel.domain.Post" useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO Posts (board_id, user_id, title, content, target_author, platform_tag)
+        VALUES (#{boardId}, #{userId}, #{title}, #{content}, #{targetAuthor}, #{platformTag})
+    </insert>
+
+    <update id="increaseViewCount">
+        UPDATE Posts SET view_count = view_count + 1 WHERE post_id = #{postId}
+    </update>
+
+    <update id="updateSolved">
+        UPDATE Posts SET is_solved = #{isSolved} WHERE post_id = #{postId}
+    </update>
+
+    <!-- 본인 글 수정: user_id 조건을 함께 걸어 본인 글만 수정 가능 -->
+    <update id="updatePostByIdAndUser">
+        UPDATE Posts
+        SET title = #{title}, content = #{content}, platform_tag = #{tag}
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </update>
+
+    <!-- 마이페이지 "내가 쓴 글" 목록: find/rookie/author 게시판 통합, 본인 글만 최신순 -->
+    <select id="selectPostsByUser" resultMap="postResultMap">
+        SELECT p.*, u.nickname AS nickname, u.is_author AS is_author,
+               (SELECT COUNT(*) FROM Comments c WHERE c.post_id = p.post_id) AS comment_count,
+               CASE b.board_name
+                   WHEN '이 소설 찾아요' THEN 'find'
+                   WHEN '신인작가 광장' THEN 'rookie'
+                   WHEN '작가 정보관' THEN 'author'
+               END AS board_key
+        FROM Posts p
+        JOIN integrated_user u ON p.user_id = u.user_id
+        JOIN Boards b ON p.board_id = b.board_id
+        WHERE p.user_id = #{userId}
+        ORDER BY p.created_at DESC
+    </select>
+
+</mapper>

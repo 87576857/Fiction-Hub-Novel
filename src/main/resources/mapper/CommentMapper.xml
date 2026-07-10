@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.CommentMapper">
+
+    <resultMap id="commentResultMap" type="com.novel.domain.Comment">
+        <id property="commentId" column="comment_id" />
+        <result property="postId" column="post_id" />
+        <result property="userId" column="user_id" />
+        <result property="content" column="content" />
+        <result property="likes" column="likes" />
+        <result property="createdAt" column="created_at" />
+        <result property="nickname" column="nickname" />
+        <result property="isAuthor" column="is_author" />
+        <result property="postTitle" column="post_title" />
+        <result property="boardKey" column="board_key" />
+        <result property="type" column="type" />
+    </resultMap>
+
+    <select id="selectCommentsByPost" resultMap="commentResultMap">
+        SELECT c.*, u.nickname AS nickname, u.is_author AS is_author, 'comment' AS type
+        FROM Comments c
+        JOIN integrated_user u ON c.user_id = u.user_id
+        WHERE c.post_id = #{postId}
+        ORDER BY c.created_at ASC
+    </select>
+
+    <insert id="insertComment" parameterType="com.novel.domain.Comment" useGeneratedKeys="true" keyProperty="commentId">
+        INSERT INTO Comments (post_id, user_id, content)
+        VALUES (#{postId}, #{userId}, #{content})
+    </insert>
+
+    <!-- 마이페이지 "내가 쓴 댓글" 목록: 원글 제목/게시판 정보 포함, 최신순 -->
+    <select id="selectCommentsByUser" resultMap="commentResultMap">
+        SELECT c.*, u.nickname AS nickname, u.is_author AS is_author,
+               p.title AS post_title,
+               CASE b.board_name
+                   WHEN '이 소설 찾아요' THEN 'find'
+                   WHEN '신인작가 광장' THEN 'rookie'
+                   WHEN '작가 정보관' THEN 'author'
+               END AS board_key,
+               'comment' AS type
+        FROM Comments c
+        JOIN integrated_user u ON c.user_id = u.user_id
+        JOIN Posts p ON c.post_id = p.post_id
+        JOIN Boards b ON p.board_id = b.board_id
+        WHERE c.user_id = #{userId}
+        ORDER BY c.created_at DESC
+    </select>
+
+    <!-- 본인 댓글 삭제: user_id 조건을 함께 걸어 본인 댓글만 삭제 가능 -->
+    <delete id="deleteCommentByIdAndUser">
+        DELETE FROM Comments
+        WHERE comment_id = #{commentId} AND user_id = #{userId}
+    </delete>
+
+</mapper>

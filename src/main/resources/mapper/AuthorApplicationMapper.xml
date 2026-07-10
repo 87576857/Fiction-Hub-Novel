@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.AuthorApplicationMapper">
+
+    <resultMap id="applicationResultMap" type="com.novel.domain.AuthorApplication">
+        <id property="applicationId" column="application_id" />
+        <result property="userId" column="user_id" />
+        <result property="penName" column="pen_name" />
+        <result property="workTitle" column="work_title" />
+        <result property="platform" column="platform" />
+        <result property="description" column="description" />
+        <result property="status" column="status" />
+        <result property="reviewedBy" column="reviewed_by" />
+        <result property="reviewedAt" column="reviewed_at" />
+        <result property="rejectReason" column="reject_reason" />
+        <result property="createdAt" column="created_at" />
+        <result property="username" column="username" />
+        <result property="nickname" column="nickname" />
+    </resultMap>
+
+    <select id="selectPendingApplications" resultMap="applicationResultMap">
+        SELECT a.*, u.username AS username, u.nickname AS nickname
+        FROM Author_Applications a
+        JOIN integrated_user u ON a.user_id = u.user_id
+        WHERE a.status = 'PENDING'
+        ORDER BY a.created_at ASC
+    </select>
+
+    <select id="countPendingApplications" resultType="int">
+        SELECT COUNT(*) FROM Author_Applications WHERE status = 'PENDING'
+    </select>
+
+    <select id="selectApplicationById" resultMap="applicationResultMap">
+        SELECT a.*, u.username AS username, u.nickname AS nickname
+        FROM Author_Applications a
+        JOIN integrated_user u ON a.user_id = u.user_id
+        WHERE a.application_id = #{applicationId}
+    </select>
+
+    <select id="selectLatestApplicationByUserId" resultMap="applicationResultMap">
+        SELECT a.*, u.username AS username, u.nickname AS nickname
+        FROM Author_Applications a
+        JOIN integrated_user u ON a.user_id = u.user_id
+        WHERE a.user_id = #{userId}
+        ORDER BY a.created_at DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertApplication" parameterType="com.novel.domain.AuthorApplication"
+            useGeneratedKeys="true" keyProperty="applicationId">
+        INSERT INTO Author_Applications (user_id, pen_name, work_title, platform, description, status)
+        VALUES (#{userId}, #{penName}, #{workTitle}, #{platform}, #{description}, 'PENDING')
+    </insert>
+
+    <update id="approveApplication">
+        UPDATE Author_Applications
+        SET status = 'APPROVED', reviewed_by = #{adminId}, reviewed_at = NOW()
+        WHERE application_id = #{applicationId}
+    </update>
+
+    <update id="rejectApplication">
+        UPDATE Author_Applications
+        SET status = 'REJECTED', reviewed_by = #{adminId}, reviewed_at = NOW(), reject_reason = #{reason}
+        WHERE application_id = #{applicationId}
+    </update>
+
+</mapper>

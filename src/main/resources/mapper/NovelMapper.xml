@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.dao.NovelMapper">
+
+    <resultMap id="novelResultMap" type="com.novel.domain.Novel">
+        <id property="novelId" column="novel_id" />
+        <result property="title" column="title" />
+        <result property="authorName" column="author_name" />
+        <result property="summary" column="summary" />
+        <result property="coverImageUrl" column="cover_image_url" />
+        <result property="platform" column="platform" />
+        <result property="viewCount" column="view_count" />
+        <result property="managedBy" column="managed_by" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="managedByNickname" column="managed_by_nickname" />
+        <result property="averageRating" column="avg_rating" />
+        <result property="reviewCount" column="review_count" />
+    </resultMap>
+
+    <select id="selectAllNovels" resultMap="novelResultMap">
+        SELECT n.*, u.nickname AS managed_by_nickname
+        FROM Novels n
+        LEFT JOIN integrated_user u ON n.managed_by = u.user_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                n.title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY n.created_at DESC
+    </select>
+
+    <select id="selectNovelsPaged" resultMap="novelResultMap">
+        SELECT n.*, u.nickname AS managed_by_nickname,
+               (SELECT ROUND(AVG(nr.rating), 1) FROM Novel_Reviews nr WHERE nr.novel_id = n.novel_id) AS avg_rating,
+               (SELECT COUNT(*) FROM Novel_Reviews nr WHERE nr.novel_id = n.novel_id) AS review_count
+        FROM Novels n
+        LEFT JOIN integrated_user u ON n.managed_by = u.user_id
+        <where>
+            <if test="platform != null and platform != ''">
+                n.platform = #{platform}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND n.title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        <choose>
+            <when test="sort == 'view'">
+                ORDER BY n.view_count DESC, n.created_at DESC
+            </when>
+            <when test="sort == 'reviews'">
+                ORDER BY review_count DESC, n.created_at DESC
+            </when>
+            <when test="sort == 'rating'">
+                ORDER BY avg_rating DESC, n.created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY n.created_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectTopNovelsByViewCount" resultMap="novelResultMap">
+        SELECT n.*, u.nickname AS managed_by_nickname
+        FROM Novels n
+        LEFT JOIN integrated_user u ON n.managed_by = u.user_id
+        ORDER BY n.view_count DESC, n.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="countAllNovels" resultType="int">
+        SELECT COUNT(*) FROM Novels
+        <where>
+            <if test="platform != null and platform != ''">
+                platform = #{platform}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectNovelById" resultMap="novelResultMap">
+        SELECT n.*, u.nickname AS managed_by_nickname
+        FROM Novels n
+        LEFT JOIN integrated_user u ON n.managed_by = u.user_id
+        WHERE n.novel_id = #{novelId}
+    </select>
+
+    <insert id="insertNovel" parameterType="com.novel.domain.Novel" useGeneratedKeys="true" keyProperty="novelId">
+        INSERT INTO Novels (title, author_name, summary, cover_image_url, platform, managed_by)
+        VALUES (#{title}, #{authorName}, #{summary}, #{coverImageUrl}, #{platform}, #{managedBy})
+    </insert>
+
+    <update id="updateNovel">
+        UPDATE Novels
+        SET title = #{title},
+            author_name = #{authorName},
+            summary = #{summary},
+            cover_image_url = #{coverImageUrl},
+            platform = #{platform},
+            managed_by = #{managedBy}
+        WHERE novel_id = #{novelId}
+    </update>
+
+    <delete id="deleteNovel">
+        DELETE FROM Novels WHERE novel_id = #{novelId}
+    </delete>
+
+    <update id="increaseViewCount">
+        UPDATE Novels SET view_count = view_count + 1 WHERE novel_id = #{novelId}
+    </update>
+
+</mapper>

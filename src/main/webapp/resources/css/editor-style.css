@@ -1,0 +1,22 @@
+/* editor-style.css */
+
+/* 에디터가 적용된 영역의 전체적인 높이와 테두리 스타일 */
+.ck-editor__editable_inline {
+    min-height: 300px;
+    border: 1px solid #ced4da !important;
+    border-radius: 0 0 0.375rem 0.375rem !important;
+    padding: 10px;
+}
+
+/* 툴바(기능 버튼들) 스타일 조정 */
+.ck.ck-toolbar {
+    border: 1px solid #ced4da !important;
+    border-bottom: none !important;
+    border-radius: 0.375rem 0.375rem 0 0 !important;
+    background-color: #f8f9fa !important;
+}
+
+/* 툴바가 상단에 붙어있을 때의 간격 */
+.ck.ck-editor__top {
+    margin-bottom: 5px;
+}
