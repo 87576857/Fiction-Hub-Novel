@@ -91,6 +91,12 @@ public class BoardController {
 		if (loginUser == null) {
 			return "redirect:/login";
 		}
+		// rookie 게시판은 CKEditor로 작성된 HTML을 그대로 저장/렌더링하므로,
+		// <script> 등 위험 태그를 서버에서 화이트리스트 기준으로 제거한다.
+		// find/author는 일반 textarea(순수 텍스트)이며 뷰(JSP)에서 <c:out>으로 이스케이프한다.
+		if ("rookie".equals(boardKey)) {
+			content = com.novel.util.HtmlSanitizer.sanitize(content);
+		}
 		Post post = new Post();
 		post.setUserId(loginUser.getUserId());
 		post.setTitle(title);
@@ -141,6 +147,9 @@ public class BoardController {
 		User loginUser = currentUser(session);
 		if (loginUser == null) {
 			return "redirect:/login";
+		}
+		if ("rookie".equals(boardKey)) {
+			content = com.novel.util.HtmlSanitizer.sanitize(content);
 		}
 		boolean updated = postService.updateMyPost(postId, loginUser.getUserId(), title, content, tag);
 		if (!updated) {

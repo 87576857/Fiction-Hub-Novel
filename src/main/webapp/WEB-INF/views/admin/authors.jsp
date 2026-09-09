@@ -21,14 +21,14 @@
             <div class="board-card mb-3">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
-                  <div class="fw-bold" style="font-size:15px;">${a.penName}
-                    <span style="color:var(--muted);font-weight:400;font-size:13px;">(신청자: ${a.nickname} / ${a.username})</span></div>
-                  <div style="font-size:13px;color:var(--muted);">대표작: ${a.workTitle}<c:if test="${not empty a.platform}"> · ${a.platform}</c:if></div>
+                  <div class="fw-bold" style="font-size:15px;"><c:out value="${a.penName}"/>
+                    <span style="color:var(--muted);font-weight:400;font-size:13px;">(신청자: <c:out value="${a.nickname}"/> / <c:out value="${a.username}"/>)</span></div>
+                  <div style="font-size:13px;color:var(--muted);">대표작: <c:out value="${a.workTitle}"/><c:if test="${not empty a.platform}"> · <c:out value="${a.platform}"/></c:if></div>
                 </div>
                 <span class="chip chip-genre">PENDING</span>
               </div>
               <c:if test="${not empty a.description}">
-                <p style="font-size:13px;">${a.description}</p>
+                <p style="font-size:13px;"><c:out value="${a.description}"/></p>
               </c:if>
 
               <div class="d-flex gap-2">

@@ -22,11 +22,11 @@
       <form method="post" action="${formAction}">
         <div class="mb-3">
           <label class="form-label">제목 <span class="text-danger">*</span></label>
-          <input type="text" name="title" class="form-control" value="${novel.title}" required maxlength="255" />
+          <input type="text" name="title" class="form-control" value="<c:out value='${novel.title}'/>" required maxlength="255" />
         </div>
         <div class="mb-3">
           <label class="form-label">원작 작가 <span class="text-danger">*</span></label>
-          <input type="text" name="authorName" class="form-control" value="${novel.authorName}" required maxlength="100" />
+          <input type="text" name="authorName" class="form-control" value="<c:out value='${novel.authorName}'/>" required maxlength="100" />
         </div>
         <div class="mb-3">
           <label class="form-label">연재 플랫폼 <span class="text-danger">*</span></label>
@@ -40,12 +40,12 @@
         </div>
         <div class="mb-3">
           <label class="form-label">표지 이미지 URL <span class="text-muted" style="font-size:12px;">(그리드/모달에 노출)</span></label>
-          <input type="url" name="coverImageUrl" class="form-control" value="${novel.coverImageUrl}"
+          <input type="url" name="coverImageUrl" class="form-control" value="<c:out value='${novel.coverImageUrl}'/>"
                  placeholder="https://..." maxlength="255" />
         </div>
         <div class="mb-3">
           <label class="form-label">줄거리 요약 <span class="text-muted" style="font-size:12px;">(모달 팝업에 노출)</span></label>
-          <textarea name="summary" class="form-control" rows="5">${novel.summary}</textarea>
+          <textarea name="summary" class="form-control" rows="5"><c:out value="${novel.summary}"/></textarea>
         </div>
         <div class="d-flex gap-2">
           <button type="submit" class="btn-primary-custom">${empty novel.novelId ? '등록하기' : '수정하기'}</button>

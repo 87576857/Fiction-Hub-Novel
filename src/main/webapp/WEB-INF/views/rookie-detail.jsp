@@ -14,14 +14,18 @@
     </c:when>
     <c:otherwise>
       <c:if test="${not empty errorMessage}">
-        <div class="board-card mb-3" style="border:1px solid #e57373;color:#c62828;">${errorMessage}</div>
+        <div class="board-card mb-3" style="border:1px solid #e57373;color:#c62828;"><c:out value="${errorMessage}"/></div>
       </c:if>
       <div class="board-card mb-3" style="background:var(--accent-rookie);">
-        <span class="chip chip-genre">${post.platformTag}</span>
-        <h1 class="mt-2 mb-1" style="font-family:'Gowun Batang',serif;font-size:22px;font-weight:700;">${post.title}</h1>
-        <p class="mb-0" style="font-size:13px;color:var(--muted);">${post.nickname}<c:if test="${post.isAuthor}"> ✒️</c:if> &middot; <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/> &middot; &#128065; ${post.viewCount}</p>
+        <span class="chip chip-genre"><c:out value="${post.platformTag}"/></span>
+        <h1 class="mt-2 mb-1" style="font-family:'Gowun Batang',serif;font-size:22px;font-weight:700;"><c:out value="${post.title}"/></h1>
+        <p class="mb-0" style="font-size:13px;color:var(--muted);"><c:out value="${post.nickname}"/><c:if test="${post.isAuthor}"> ✒️</c:if> &middot; <fmt:formatDate value="${post.createdAt}" pattern="yyyy.MM.dd"/> &middot; &#128065; ${post.viewCount}</p>
       </div>
-      <p class="mb-4" style="font-size:14px;line-height:1.8;background:var(--muted-bg);border-radius:1rem;padding:16px 18px; white-space:pre-line;">${post.content}</p>
+      <%-- rookie 게시판은 CKEditor로 작성한 HTML을 그대로 렌더링한다.
+           <script> 등 위험 태그는 저장 시점(BoardController.write/editSubmit)에서
+           HtmlSanitizer.sanitize()로 이미 제거되었으므로 여기서는 c:out으로 다시
+           이스케이프하지 않는다(이스케이프하면 굵게/링크 등 서식이 깨짐). --%>
+      <p class="mb-4" style="font-size:14px;line-height:1.8;background:var(--muted-bg);border-radius:1rem;padding:16px 18px;">${post.content}</p>
 
       <c:if test="${not empty sessionScope.loginUser and sessionScope.loginUser.userId == post.userId}">
         <div class="text-end mb-4">
@@ -39,10 +43,10 @@
           <c:forEach var="cmt" items="${comments}">
             <div class="review-item">
               <div class="d-flex justify-content-between align-items-start mb-2">
-                <div class="fw-bold" style="font-size:14px;">${cmt.nickname}<c:if test="${cmt.isAuthor}"> ✒️</c:if></div>
+                <div class="fw-bold" style="font-size:14px;"><c:out value="${cmt.nickname}"/><c:if test="${cmt.isAuthor}"> ✒️</c:if></div>
                 <span style="font-size:12px;color:var(--muted);"><fmt:formatDate value="${cmt.createdAt}" pattern="yyyy.MM.dd"/></span>
               </div>
-              <p class="mb-0" style="font-size:14px;line-height:1.7;">${cmt.content}</p>
+              <p class="mb-0" style="font-size:14px;line-height:1.7;"><c:out value="${cmt.content}"/></p>
             </div>
           </c:forEach>
         </c:otherwise>

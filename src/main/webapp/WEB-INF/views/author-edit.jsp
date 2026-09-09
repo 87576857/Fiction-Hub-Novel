@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="common/header.jsp" />
 
 <!-- 주소: author-edit.jsp -->
@@ -10,7 +11,7 @@
     <div class="muted-panel">
       <div class="mb-3">
         <label class="form-label fw-semibold" style="font-size:14px;">제목</label>
-        <input type="text" name="title" class="form-control" value="${post.title}" required>
+        <input type="text" name="title" class="form-control" value="<c:out value='${post.title}'/>" required>
       </div>
       <div class="mb-3">
         <label class="form-label fw-semibold" style="font-size:14px;">연차</label>
@@ -24,7 +25,7 @@
       </div>
       <div class="mb-3">
         <label class="form-label fw-semibold" style="font-size:14px;">내용</label>
-        <textarea name="content" class="form-control" rows="10" required>${post.content}</textarea>
+        <textarea name="content" class="form-control" rows="10" required><c:out value="${post.content}"/></textarea>
       </div>
       <div class="text-end d-flex justify-content-end gap-2">
         <button type="button" class="btn-outline-custom" onclick="location.href='${pageContext.request.contextPath}/author/${post.postId}'">취소</button>

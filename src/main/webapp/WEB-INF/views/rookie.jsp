@@ -42,10 +42,10 @@
     <c:otherwise>
       <c:forEach var="p" items="${posts}">
         <a class="board-list-row" href="${pageContext.request.contextPath}/rookie/${p.postId}">
-          <span class="chip chip-genre">${p.platformTag}</span>
+          <span class="chip chip-genre"><c:out value="${p.platformTag}"/></span>
           <div class="flex-grow-1">
-            <div class="fw-bold" style="font-size:15px;">${p.title}</div>
-            <div style="font-size:12px;color:var(--muted);">${p.nickname}<c:if test="${p.isAuthor}"> ✒️</c:if> &middot; <fmt:formatDate value="${p.createdAt}" pattern="yyyy.MM.dd"/> &middot; &#128065; ${p.viewCount}</div>
+            <div class="fw-bold" style="font-size:15px;"><c:out value="${p.title}"/></div>
+            <div style="font-size:12px;color:var(--muted);"><c:out value="${p.nickname}"/><c:if test="${p.isAuthor}"> ✒️</c:if> &middot; <fmt:formatDate value="${p.createdAt}" pattern="yyyy.MM.dd"/> &middot; &#128065; ${p.viewCount}</div>
           </div>
           <span class="comment-badge">&#128172; ${p.commentCount}</span>
         </a>

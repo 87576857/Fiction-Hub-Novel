@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:include page="common/header.jsp" />
 
 <!-- 주소: mypage-posts.jsp -->
@@ -21,20 +22,27 @@
     </c:when>
     <c:otherwise>
       <div class="table-responsive">
-        <table class="table align-middle">
+        <table class="table align-middle" style="table-layout:fixed;width:100%;">
+          <colgroup>
+            <col style="width:120px;">
+            <col>
+            <col style="width:80px;">
+            <col style="width:80px;">
+            <col style="width:100px;">
+          </colgroup>
           <thead>
             <tr><th>게시판</th><th>제목</th><th>댓글</th><th>조회수</th><th>작성일</th></tr>
           </thead>
           <tbody>
             <c:forEach var="p" items="${posts}">
               <tr style="cursor:pointer;" onclick="location.href='${pageContext.request.contextPath}/${p.boardKey}/${p.postId}'">
-                <td><span class="chip chip-default">${p.boardKey}</span></td>
-                <td>${p.title}
+                <td><span class="chip chip-default"><c:out value="${p.boardKey}"/></span></td>
+                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(p.title)}"><c:out value="${p.title}"/>
                   <c:if test="${p.boardKey == 'find' and p.isSolved}"> <span class="chip chip-genre">해결</span></c:if>
                 </td>
                 <td>${p.commentCount}</td>
                 <td>${p.viewCount}</td>
-                <td style="font-size:12px;color:var(--muted);"><fmt:formatDate value="${p.createdAt}" pattern="yyyy-MM-dd" /></td>
+                <td style="font-size:12px;color:var(--muted);white-space:nowrap;"><fmt:formatDate value="${p.createdAt}" pattern="yyyy-MM-dd" /></td>
               </tr>
             </c:forEach>
           </tbody>

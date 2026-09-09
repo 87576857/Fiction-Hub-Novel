@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:include page="common/header.jsp" />
 
 <!-- 주소: mypage-comments.jsp -->
@@ -21,7 +22,14 @@
     </c:when>
     <c:otherwise>
       <div class="table-responsive">
-        <table class="table align-middle">
+        <table class="table align-middle" style="table-layout:fixed;width:100%;">
+          <colgroup>
+            <col style="width:100px;">
+            <col style="width:22%;">
+            <col>
+            <col style="width:100px;">
+            <col style="width:70px;">
+          </colgroup>
           <thead>
             <tr><th>게시판</th><th>원글 제목</th><th>내 댓글</th><th>작성일</th><th></th></tr>
           </thead>
@@ -29,9 +37,9 @@
             <c:forEach var="cm" items="${comments}">
               <tr style="cursor:pointer;" onclick="location.href='${pageContext.request.contextPath}/${cm.boardKey}/${cm.postId}'">
                 <td><span class="chip chip-default">${cm.boardKey == 'review' ? '리뷰' : cm.boardKey}</span></td>
-                <td>${cm.postTitle}</td>
-                <td>${cm.content}</td>
-                <td style="font-size:12px;color:var(--muted);"><fmt:formatDate value="${cm.createdAt}" pattern="yyyy-MM-dd" /></td>
+                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(cm.postTitle)}"><c:out value="${cm.postTitle}"/></td>
+                <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(cm.content)}"><c:out value="${cm.content}"/></td>
+                <td style="font-size:12px;color:var(--muted);white-space:nowrap;"><fmt:formatDate value="${cm.createdAt}" pattern="yyyy-MM-dd" /></td>
                 <td>
                   <form method="post" action="${pageContext.request.contextPath}/mypage/comments/delete"
                         onclick="event.stopPropagation();"

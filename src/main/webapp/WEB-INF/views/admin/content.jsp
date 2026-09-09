@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:include page="../common/header.jsp" />
 
 <!-- 주소: admin/content.jsp -->
@@ -60,7 +61,15 @@
           </c:when>
           <c:otherwise>
             <div class="table-responsive mb-2">
-              <table class="table align-middle">
+              <table class="table align-middle" style="table-layout:fixed;width:100%;">
+                <colgroup>
+                  <col style="width:36px;">
+                  <col style="width:110px;">
+                  <col>
+                  <col style="width:110px;">
+                  <col style="width:70px;">
+                  <col style="width:100px;">
+                </colgroup>
                 <thead>
                   <tr><th></th><th>게시판</th><th>제목</th><th>작성자</th><th>조회수</th><th>작성일</th></tr>
                 </thead>
@@ -69,10 +78,10 @@
                     <tr>
                       <td><input type="checkbox" name="postIds" value="${p.postId}" /></td>
                       <td><span class="chip chip-default">${p.boardKey == 'find' ? '이 소설 찾아요' : (p.boardKey == 'rookie' ? '신인작가 광장' : '작가 정보관')}</span></td>
-                      <td>${p.title}</td>
-                      <td>${p.nickname}</td>
+                      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(p.title)}"><c:out value="${p.title}"/></td>
+                      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(p.nickname)}"><c:out value="${p.nickname}"/></td>
                       <td>${p.viewCount}</td>
-                      <td style="font-size:12px;color:var(--muted);"><fmt:formatDate value="${p.createdAt}" pattern="yyyy-MM-dd" /></td>
+                      <td style="font-size:12px;color:var(--muted);white-space:nowrap;"><fmt:formatDate value="${p.createdAt}" pattern="yyyy-MM-dd" /></td>
                     </tr>
                   </c:forEach>
                 </tbody>
@@ -151,7 +160,14 @@
           </c:when>
           <c:otherwise>
             <div class="table-responsive mb-2">
-              <table class="table align-middle">
+              <table class="table align-middle" style="table-layout:fixed;width:100%;">
+                <colgroup>
+                  <col style="width:36px;">
+                  <col style="width:110px;">
+                  <col>
+                  <col style="width:110px;">
+                  <col style="width:100px;">
+                </colgroup>
                 <thead>
                   <tr><th></th><th>구분</th><th>내용</th><th>작성자</th><th>작성일</th></tr>
                 </thead>
@@ -160,9 +176,9 @@
                     <tr>
                       <td><input type="checkbox" name="commentKeys" value="${cm.type}:${cm.commentId}" /></td>
                       <td><span class="chip chip-default">${cm.type == 'review' ? '리뷰' : (cm.boardKey == 'find' ? '이 소설 찾아요' : (cm.boardKey == 'rookie' ? '신인작가 광장' : '작가 정보관'))}</span></td>
-                      <td>${cm.content}</td>
-                      <td>${cm.nickname}</td>
-                      <td style="font-size:12px;color:var(--muted);"><fmt:formatDate value="${cm.createdAt}" pattern="yyyy-MM-dd" /></td>
+                      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(cm.content)}"><c:out value="${cm.content}"/></td>
+                      <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(cm.nickname)}"><c:out value="${cm.nickname}"/></td>
+                      <td style="font-size:12px;color:var(--muted);white-space:nowrap;"><fmt:formatDate value="${cm.createdAt}" pattern="yyyy-MM-dd" /></td>
                     </tr>
                   </c:forEach>
                 </tbody>

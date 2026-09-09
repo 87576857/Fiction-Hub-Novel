@@ -71,7 +71,7 @@
           <div class="col-6 col-md-3">
             <div class="novel-frame" style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#novelModal${n.novelId}">
               <c:if test="${not empty n.coverImageUrl}">
-                <img src="${n.coverImageUrl}" alt="${n.title}"
+                <img src="<c:out value='${n.coverImageUrl}'/>" alt="<c:out value='${n.title}'/>"
                      style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;" />
               </c:if>
               <c:if test="${empty n.coverImageUrl}">
@@ -80,9 +80,9 @@
                   표지 없음
                 </div>
               </c:if>
-              <div class="mt-2" style="font-size:14px;font-weight:700;line-height:1.3;">${n.title}</div>
+              <div class="mt-2" style="font-size:14px;font-weight:700;line-height:1.3;"><c:out value="${n.title}"/></div>
               <div style="font-size:12px;color:var(--muted);">
-                ${n.authorName} · ${n.platform}
+                <c:out value="${n.authorName}"/> · <c:out value="${n.platform}"/>
                 <c:if test="${not empty n.averageRating}"> · ⭐${n.averageRating}</c:if>
                 <c:if test="${empty n.averageRating}"> · <span style="color:#bbb;">평점 없음</span></c:if>
               </div>
@@ -94,13 +94,13 @@
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" style="font-family:'Gowun Batang',serif;">${n.title}</h5>
+                  <h5 class="modal-title" style="font-family:'Gowun Batang',serif;"><c:out value="${n.title}"/></h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" style="display:grid;grid-template-columns:100px 1fr;gap:14px;align-items:start;">
                   <div>
                     <c:if test="${not empty n.coverImageUrl}">
-                      <img src="${n.coverImageUrl}" alt="${n.title}"
+                      <img src="<c:out value='${n.coverImageUrl}'/>" alt="<c:out value='${n.title}'/>"
                            style="width:100%;display:block;border-radius:6px;object-fit:cover;aspect-ratio:3/4;" />
                     </c:if>
                     <c:if test="${empty n.coverImageUrl}">
@@ -110,9 +110,9 @@
                   </div>
                   <div style="min-width:0;">
                     <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">
-                      원작: ${n.authorName} · ${n.platform}
+                      원작: <c:out value="${n.authorName}"/> · <c:out value="${n.platform}"/>
                     </div>
-                    <p style="font-size:14px;white-space:pre-line;">${n.summary}</p>
+                    <p style="font-size:14px;white-space:pre-line;"><c:out value="${n.summary}"/></p>
 
                     <c:set var="topReviews" value="${topReviewsByNovel[n.novelId]}" />
                     <c:if test="${not empty topReviews}">
@@ -120,9 +120,9 @@
                         <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;">👍 좋아요 많은 리뷰</div>
                         <c:forEach var="tr" items="${topReviews}">
                           <div class="mb-2" style="font-size:13px;">
-                            <span style="font-weight:700;">${tr.nickname}</span>
+                            <span style="font-weight:700;"><c:out value="${tr.nickname}"/></span>
                             <span style="color:var(--muted);"> · ⭐${tr.rating} · 👍${tr.likes}</span>
-                            <div style="color:#333;">${tr.reviewText}</div>
+                            <div style="color:#333;"><c:out value="${tr.reviewText}"/></div>
                           </div>
                         </c:forEach>
                       </div>

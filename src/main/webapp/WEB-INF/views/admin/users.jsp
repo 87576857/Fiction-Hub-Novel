@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:include page="../common/header.jsp" />
 
 <!-- 주소: admin/users.jsp -->
@@ -26,7 +27,16 @@
         </c:when>
         <c:otherwise>
           <div class="table-responsive mb-5">
-            <table class="table align-middle">
+            <table class="table align-middle" style="table-layout:fixed;width:100%;">
+              <colgroup>
+                <col style="width:140px;">
+                <col style="width:140px;">
+                <col>
+                <col style="width:110px;">
+                <col style="width:80px;">
+                <col style="width:100px;">
+                <col style="width:120px;">
+              </colgroup>
               <thead>
                 <tr>
                   <th>아이디</th><th>닉네임</th><th>이메일</th><th>권한</th><th>상태</th><th>가입일</th><th></th>
@@ -35,9 +45,9 @@
               <tbody>
                 <c:forEach var="u" items="${adminUsers}">
                   <tr>
-                    <td>${u.username}</td>
-                    <td>${u.nickname}<c:if test="${u.isAuthor}"> ✒️</c:if></td>
-                    <td>${u.email}</td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.username)}"><c:out value="${u.username}"/></td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.nickname)}"><c:out value="${u.nickname}"/><c:if test="${u.isAuthor}"> ✒️</c:if></td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.email)}"><c:out value="${u.email}"/></td>
                     <td><span class="chip chip-default">${u.role}</span></td>
                     <td>
                       <c:choose>
@@ -75,7 +85,16 @@
         </c:when>
         <c:otherwise>
           <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table align-middle" style="table-layout:fixed;width:100%;">
+              <colgroup>
+                <col style="width:140px;">
+                <col style="width:140px;">
+                <col>
+                <col style="width:110px;">
+                <col style="width:80px;">
+                <col style="width:100px;">
+                <col style="width:120px;">
+              </colgroup>
               <thead>
                 <tr>
                   <th>아이디</th><th>닉네임</th><th>이메일</th><th>권한</th><th>상태</th><th>가입일</th><th></th>
@@ -84,9 +103,9 @@
               <tbody>
                 <c:forEach var="u" items="${users}">
                   <tr>
-                    <td>${u.username}</td>
-                    <td>${u.nickname}<c:if test="${u.isAuthor}"> ✒️</c:if></td>
-                    <td>${u.email}</td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.username)}"><c:out value="${u.username}"/></td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.nickname)}"><c:out value="${u.nickname}"/><c:if test="${u.isAuthor}"> ✒️</c:if></td>
+                    <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${fn:escapeXml(u.email)}"><c:out value="${u.email}"/></td>
                     <td><span class="chip chip-default">${u.role}</span></td>
                     <td>
                       <c:choose>

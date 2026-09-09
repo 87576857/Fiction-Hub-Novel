@@ -14,12 +14,12 @@
     <div class="mb-3">
       <label class="form-label">아이디</label>
       <input type="text" name="username" class="form-control ${errorField == 'username' ? 'is-invalid' : ''}"
-             value="${user.username}" required minlength="4" maxlength="50" pattern="[a-zA-Z0-9]+"
+             value="<c:out value='${user.username}'/>" required minlength="4" maxlength="50" pattern="[a-zA-Z0-9]+"
              title="영문/숫자 4자 이상" />
     </div>
     <div class="mb-3">
       <label class="form-label">비밀번호</label>
-      <input type="password" name="password" class="form-control" required minlength="8"
+      <input type="password" name="password" class="form-control ${errorField == 'password' ? 'is-invalid' : ''}" required minlength="8"
              title="8자 이상 입력해주세요" />
     </div>
     <div class="mb-3">
@@ -29,16 +29,16 @@
     </div>
     <div class="mb-3">
       <label class="form-label">닉네임</label>
-      <input type="text" name="nickname" class="form-control" value="${user.nickname}" required maxlength="50" />
+      <input type="text" name="nickname" class="form-control ${errorField == 'nickname' ? 'is-invalid' : ''}" value="<c:out value='${user.nickname}'/>" required maxlength="50" />
     </div>
     <div class="mb-3">
       <label class="form-label">이메일</label>
       <input type="email" name="email" class="form-control ${errorField == 'email' ? 'is-invalid' : ''}"
-             value="${user.email}" required maxlength="100" />
+             value="<c:out value='${user.email}'/>" required maxlength="100" />
     </div>
     <div class="mb-3">
       <label class="form-label">나이 <span class="text-muted" style="font-size:12px;">(선택)</span></label>
-      <input type="number" name="age" class="form-control" min="1" max="120" value="${user.age}" />
+      <input type="number" name="age" class="form-control ${errorField == 'age' ? 'is-invalid' : ''}" min="1" max="120" value="${user.age}" />
     </div>
     <div class="form-check mb-3">
       <input type="checkbox" class="form-check-input" id="agree" required />

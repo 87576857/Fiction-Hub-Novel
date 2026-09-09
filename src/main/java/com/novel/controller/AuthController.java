@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.novel.domain.User;
 import com.novel.exception.DuplicateFieldException;
 import com.novel.exception.InvalidLoginException;
+import com.novel.exception.InvalidRegistrationException;
 import com.novel.exception.InvalidTokenException;
 import com.novel.exception.SuspendedUserException;
 import com.novel.service.AuthService;
@@ -47,6 +48,11 @@ public class AuthController {
 			return "redirect:/login?registered";
 		} catch (DuplicateFieldException e) {
 			// 실패 시 입력값 유지 + 어느 필드가 중복인지 표시
+			model.addAttribute("errorField", e.getField());
+			model.addAttribute("errorMessage", e.getMessage());
+			return "register";
+		} catch (InvalidRegistrationException e) {
+			// 클라이언트(HTML5) 검증을 우회해 서버에 직접 요청한 경우 - 길이/형식 위반
 			model.addAttribute("errorField", e.getField());
 			model.addAttribute("errorMessage", e.getMessage());
 			return "register";

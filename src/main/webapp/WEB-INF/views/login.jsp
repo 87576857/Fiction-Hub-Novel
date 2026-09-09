@@ -13,7 +13,7 @@
     <div class="alert alert-success">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해주세요.</div>
   </c:if>
   <c:if test="${not empty errorMessage}">
-    <div class="alert alert-danger">${errorMessage}</div>
+    <div class="alert alert-danger"><c:out value="${errorMessage}"/></div>
   </c:if>
 
   <form method="post" action="${pageContext.request.contextPath}/login">

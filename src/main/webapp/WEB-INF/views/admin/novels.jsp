@@ -39,16 +39,16 @@
           <c:forEach var="n" items="${novels}">
             <div class="board-card mb-3 d-flex gap-3">
               <c:if test="${not empty n.coverImageUrl}">
-                <img src="${n.coverImageUrl}" alt="${n.title}" style="width:56px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
+                <img src="<c:out value='${n.coverImageUrl}'/>" alt="<c:out value='${n.title}'/>" style="width:56px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
               </c:if>
               <div class="flex-grow-1" style="min-width:0;">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
-                    <div class="fw-bold" style="font-size:15px;">${n.title}
-                      <span style="color:var(--muted);font-weight:400;font-size:13px;">(원작: ${n.authorName})</span></div>
-                    <div style="font-size:13px;color:var(--muted);">${n.platform} · 조회 ${n.viewCount} · 등록자 ${n.managedByNickname}</div>
+                    <div class="fw-bold" style="font-size:15px;"><c:out value="${n.title}"/>
+                      <span style="color:var(--muted);font-weight:400;font-size:13px;">(원작: <c:out value="${n.authorName}"/>)</span></div>
+                    <div style="font-size:13px;color:var(--muted);"><c:out value="${n.platform}"/> · 조회 ${n.viewCount} · 등록자 <c:out value="${n.managedByNickname}"/></div>
                   </div>
-                  <span class="chip chip-default">${n.platform}</span>
+                  <span class="chip chip-default"><c:out value="${n.platform}"/></span>
                 </div>
                 <p style="font-size:13px;margin:8px 0;" class="text-truncate">${n.summary}</p>
                 <div class="d-flex gap-2">
